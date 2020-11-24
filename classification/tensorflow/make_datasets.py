@@ -9,11 +9,6 @@ import pathlib
 import random
 import numpy as np
 
-train_data_path = '../../../datasets/estern_wells/'
-
-dataset_name = 'testset'
-save_path = './dataset_info'
-label_path = './label'
 
 class MakeDataSetInfo:
 
@@ -27,14 +22,19 @@ class MakeDataSetInfo:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    def make_dataframe(self):
+    def make_dataframe(self, label_save=False):
         print('make_dataframe')
         label_list = sorted([folder for folder in os.listdir(self.train_data_path) if not folder.startswith('.')])
         
-        label_txt = pd.DataFrame(label_list)
-        label_txt.to_csv(f'./{self.label_path}/{dataset_name}_label.txt', index=False, header=False)
-        print(f'./{self.label_path}/{dataset_name}_label.txt  saved!!!')
+        if label_save == True:
+            label_txt = pd.DataFrame(label_list)
+            self.make_folder(self.label_path)
+            label_txt.to_csv(f'./{self.label_path}/{self.dataset_name}_label.txt', index=False, header=False)
+            print(f'./{self.label_path}/{self.dataset_name}_label.txt  saved!!!')
 
+        else:
+            print('label.txt file is not saved.')
+        
         idx = 0
         result = []
         
@@ -53,7 +53,7 @@ class MakeDataSetInfo:
         return img_df, label_list
 
     def cross_validation(self, n_splits):
-        img_df = self.make_dataframe()[0]
+        img_df = self.make_dataframe(label_save=True)[0]
         print(len(img_df))
 
         X = img_df[['idx','label']].values[:,0]
@@ -66,7 +66,7 @@ class MakeDataSetInfo:
         for i, (trn_idx, vld_idx) in enumerate(skf.split(X,y)):
             img_df.loc[vld_idx, 'fold'] = i
             
-        self.make_folder(save_path)
+        self.make_folder(self.save_path)
         img_df.to_csv(f'{self.save_path}/{self.dataset_name}_datainfo.csv', index = False)
 
         return img_df
@@ -205,8 +205,8 @@ class MakeDataSet:
         train_images, train_labels, train_images_len, train_labels_len = self.basic_processing(trn_img_list, True)
         valid_images, valid_labels, valid_images_len, valid_labels_len = self.basic_processing(vld_img_list, False)
 
-        TRAIN_STEP_PER_EPOCH = tf.math.ceil(train_images_len / self.batch_size).numpy()
-        VALID_STEP_PER_EPOCH = tf.math.ceil(valid_images_len / self.batch_size).numpy()
+        #TRAIN_STEP_PER_EPOCH = tf.math.ceil(train_images_len / self.batch_size).numpy()
+        #VALID_STEP_PER_EPOCH = tf.math.ceil(valid_images_len / self.batch_size).numpy()
 
         AUTOTUNE = tf.data.experimental.AUTOTUNE  #############
         
