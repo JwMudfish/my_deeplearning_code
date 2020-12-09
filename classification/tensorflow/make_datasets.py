@@ -1,9 +1,9 @@
 from sklearn.model_selection import StratifiedKFold
-from efficientnet.tfkeras import preprocess_input
+#from efficientnet.tfkeras import preprocess_input
 import pandas as pd
 import os
 from glob import glob
-import tensorflow as tf
+import tensorflow as tf  #tf 2.3
 from tensorflow import keras
 import pathlib
 import random
@@ -52,7 +52,7 @@ class MakeDataSetInfo:
         img_df = pd.DataFrame(result, columns=['idx','label','image_path'])
         return img_df, label_list
 
-    def cross_validation(self, n_splits):
+    def cross_validation(self, n_splits, auto_save=True):
         img_df = self.make_dataframe(label_save=True)[0]
         print(len(img_df))
 
@@ -65,22 +65,26 @@ class MakeDataSetInfo:
 
         for i, (trn_idx, vld_idx) in enumerate(skf.split(X,y)):
             img_df.loc[vld_idx, 'fold'] = i
-            
-        self.make_folder(self.save_path)
-        img_df.to_csv(f'{self.save_path}/{self.dataset_name}_datainfo.csv', index = False)
+
+        if auto_save==True:
+            self.make_folder(self.save_path)
+            img_df.to_csv(f'{self.save_path}/{self.dataset_name}_datainfo.csv', index = False)
 
         return img_df
 
 
-class MakeDataSet:
-    def __init__(self, dataframe, train_data_path, batch_size, valid_set_num, img_size, is_cutmix=False, prob = 0.3):
+class MakeDataSet:  
+    def __init__(self, dataframe, dataset_name, train_data_path, df_info_path, batch_size, valid_set_num, img_size, is_cutmix=False, prob = 0.3, read_from_csv=False):
         self.dataframe = dataframe
+        self.dataset_name = dataset_name
         self.batch_size = batch_size
         self.valid_set_num = valid_set_num
         self.train_data_path = train_data_path
         self.img_size = img_size
         self.is_cutmix = is_cutmix
         self.prob = prob
+        self.df_info_path = df_info_path
+        self.read_from_csv = read_from_csv
 
     def make_label_len(self):
         labels = sorted([folder for folder in os.listdir(self.train_data_path) if not folder.startswith('.')])
@@ -88,7 +92,11 @@ class MakeDataSet:
         return label_len
 
     def split_dataset(self):
-        img_df = self.dataframe
+        if self.read_from_csv == True:
+            img_df = pd.read_csv(f'{self.df_info_path}/{self.dataset_name}_datainfo.csv')
+        else:
+            img_df = self.dataframe
+
         trn_fold = [i for i in range(10) if i not in [self.valid_set_num]]
         vld_fold = [self.valid_set_num]
 
@@ -123,10 +131,11 @@ class MakeDataSet:
         return images, labels, len_images, labels_len
 
     def preprocess_image(self, image):
-
+        #from efficientnet.tfkeras import preprocess_input
         image = tf.image.decode_jpeg(image, channels=3)
         image = tf.image.resize(image, [self.img_size, self.img_size])  #  antialias = True 
-        image = preprocess_input(image)
+        #image = preprocess_input(image)
+        image = tf.keras.applications.efficientnet.preprocess_input(image)
         return image
 
     # 이미지 path -> tensor
@@ -213,17 +222,17 @@ class MakeDataSet:
         if self.is_cutmix == True:
             print('cutmix 적용')
             train_ds = self.make_tf_dataset(train_images, train_labels)
-            train_ds = train_ds.repeat().batch(self.batch_size).map(self.cutmix).prefetch(tf.data.experimental.AUTOTUNE) # tf.data.experimental.AUTOTUNE
+            train_ds = train_ds.repeat().batch(self.batch_size).map(self.cutmix).prefetch(AUTOTUNE) # tf.data.experimental.AUTOTUNE
 
             valid_ds = self.make_tf_dataset(valid_images, valid_labels)
-            valid_ds = valid_ds.repeat().batch(self.batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+            valid_ds = valid_ds.repeat().batch(self.batch_size).prefetch(AUTOTUNE)
         else:
             print('cutmix 비적용')
             train_ds = self.make_tf_dataset(train_images, train_labels)
-            train_ds = train_ds.repeat().batch(self.batch_size).prefetch(tf.data.experimental.AUTOTUNE) # tf.data.experimental.AUTOTUNE
+            train_ds = train_ds.repeat().batch(self.batch_size).prefetch(AUTOTUNE) # tf.data.experimental.AUTOTUNE
 
             valid_ds = self.make_tf_dataset(valid_images, valid_labels)
-            valid_ds = valid_ds.repeat().batch(self.batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+            valid_ds = valid_ds.repeat().batch(self.batch_size).prefetch(AUTOTUNE)
 
         return train_ds, valid_ds
 
