@@ -24,38 +24,38 @@ class MainModel:
 
     def make_backbone(self):
         if self.model_name == 'efn0':
-            from efficientnet.tfkeras import EfficientNetB0
-            base_model = EfficientNetB0(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB0
+            base_model = tf.keras.applications.EfficientNetB0(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
 
         elif self.model_name == 'efn1':
-            from efficientnet.tfkeras import EfficientNetB1
-            base_model = EfficientNetB1(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB1
+            base_model = tf.keras.applications.EfficientNetB1(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
 
         elif self.model_name == 'efn2':
-            from efficientnet.tfkeras import EfficientNetB2
-            base_model = EfficientNetB2(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB2
+            base_model = tf.keras.applications.EfficientNetB2(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
     
         elif self.model_name == 'efn3':
-            from efficientnet.tfkeras import EfficientNetB3
-            base_model = EfficientNetB3(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB3
+            base_model = tf.keras.applications.EfficientNetB3(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
 
         elif self.model_name == 'efn4':
-            from efficientnet.tfkeras import EfficientNetB4
-            base_model = EfficientNetB4(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB4
+            base_model = tf.keras.applications.EfficientNetB4(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
 
         elif self.model_name == 'efn5':
-            from efficientnet.tfkeras import EfficientNetB5
-            base_model = EfficientNetB5(weights=self.pretrained_weight,
+            #from efficientnet.tfkeras import EfficientNetB5
+            base_model = tf.keras.applications.EfficientNetB5(weights=self.pretrained_weight,
                                         include_top=False,
                                         input_shape=(self.img_size, self.img_size, 3))
 

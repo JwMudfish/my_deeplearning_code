@@ -15,7 +15,7 @@ import tensorflow as tf
 from collections import Counter
 
 
-MODE = 'dual'  # single or dual
+MODE = 'single'  # single or dual
 
 # get file path
 project_path = '/home/perth/Desktop/personal_project/0.datasets/test'
@@ -32,7 +32,7 @@ main_label_file = project_path + "/model_and_label/main_labels.txt"
 binary_label_file = project_path + "/model_and_label/empty_labels.txt"
 
 # model
-main_model_path = project_path + "/model_and_label/main_model.h5"
+main_model_path = project_path + "/model_and_label/mesa.h5"
 empty_model_path = project_path + '/model_and_label/empty_model.h5'
 
 ###########################################################################
